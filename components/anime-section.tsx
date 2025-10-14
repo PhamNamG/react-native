@@ -8,11 +8,8 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
 const PADDING_HORIZONTAL = 16;
 const GAP = 12;
-const COLUMNS = 2; // 2 cột trên 1 hàng
-const CARD_WIDTH = (SCREEN_WIDTH - PADDING_HORIZONTAL * 2 - GAP) / COLUMNS;
 
 interface AnimeSectionProps {
   title: string;
@@ -53,12 +50,12 @@ export function AnimeSection({ title, animes, onSeeAllPress }: AnimeSectionProps
 
       <View style={styles.scrollContent}>
         {animes.map((anime) => (
-          <AnimeCard
-            key={anime._id}
-            anime={anime}
-            onPress={() => handleAnimePress(anime)}
-            width={CARD_WIDTH}
-          />
+          <View key={anime._id} style={styles.cardWrapper}>
+            <AnimeCard
+              anime={anime}
+              onPress={() => handleAnimePress(anime)}
+            />
+          </View>
         ))}
       </View>
     </ThemedView>
@@ -94,7 +91,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: GAP,
-    justifyContent: 'space-between',
+  },
+  cardWrapper: {
+    width: '48%',
   },
 });
 

@@ -4,7 +4,7 @@ import { API_ENDPOINTS } from '@/constants/api';
 export interface AnimeProduct {
     _id: string;
     seri: string;
-    slug:string
+    slug: string
 }
 
 export interface Anime {
@@ -64,6 +64,11 @@ export interface AnimeResponseNominated {
 }
 
 export const animeApi = {
+
+    getAll: async (page: number): Promise<AnimeResponse> => {
+        return baseApi.get<AnimeResponse>(API_ENDPOINTS.ANIME.ALL + `?page=${page}`);
+    },
+
     getLatest: async (): Promise<AnimeResponse> => {
         return baseApi.get<AnimeResponse>(API_ENDPOINTS.ANIME.LATEST);
     },
@@ -94,15 +99,15 @@ export const animeApi = {
 
     search: async (query: string, filters?: { categories?: string[], status?: string }): Promise<AnimeResponse> => {
         let url = `${API_ENDPOINTS.ANIME.SEARCH}?value=${query}`;
-        
+
         if (filters?.categories?.length) {
             url += `&categories=${filters.categories.join(',')}`;
         }
-        
+
         if (filters?.status) {
             url += `&status=${filters.status}`;
         }
-        
+
         return baseApi.get<AnimeResponse>(url);
     },
 
@@ -110,7 +115,7 @@ export const animeApi = {
         const queryParams = new URLSearchParams();
         if (seriesId) queryParams.append('seriesId', seriesId);
         if (categoryId) queryParams.append('categoryId', categoryId);
-        
+
         return baseApi.get<AnimeResponseNominated>(`${API_ENDPOINTS.ANIME.CATEGORY_NOMINATED}?${queryParams}`);
     }
 }; 

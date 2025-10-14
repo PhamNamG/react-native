@@ -20,7 +20,7 @@ interface FeaturedBannerProps {
 export function FeaturedBanner({ posters, onPosterPress }: FeaturedBannerProps) {
   const colorScheme = useColorScheme();
   const swiperRef = useRef<any>(null);
-  
+  const isDark = colorScheme === 'dark';
   // Animation values
   const titleOpacity = useRef(new Animated.Value(0)).current;
   const titleTranslateY = useRef(new Animated.Value(30)).current;
@@ -116,14 +116,7 @@ export function FeaturedBanner({ posters, onPosterPress }: FeaturedBannerProps) 
         />
         
         <LinearGradient
-          colors={[
-            'rgba(255, 255, 255, 0)',
-            'rgba(255, 255, 255, 0.1)',
-            'rgba(255, 255, 255, 0.3)',
-            'rgba(255, 255, 255, 0.5)',
-            'rgba(255, 255, 255, 0.75)',
-            'rgba(255, 255, 255, 0.95)',
-          ]}
+          colors={isDark ? ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.1)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0.75)', 'rgba(0, 0, 0, 0.95)'] : ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.3)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0.75)', 'rgba(255, 255, 255, 0.95)']}
           locations={[0, 0.2, 0.35, 0.5, 0.7, 1]}
           style={styles.gradient}
         >

@@ -1,125 +1,163 @@
-import { StyleSheet, View, TextInput, ScrollView, Pressable } from 'react-native';
-import { useState } from 'react';
+import { StyleSheet, View, TextInput, ScrollView, ActivityIndicator, Pressable } from 'react-native';
+import { useState, useEffect, useCallback } from 'react';
 import { router } from 'expo-router';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import { MovieCard } from '@/components/movie-card';
-import { movies } from '@/data/movies';
-import { Movie } from '@/types/movie';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
+import { useSearchAnime } from '@/hooks/api/use-movies';
+import { AnimeCard } from '@/components/anime-card';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 
 export default function SearchScreen() {
   const colorScheme = useColorScheme();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const { data, isLoading, isError }:any = useSearchAnime(debouncedQuery);
 
-  const genres = ['All', 'Fantasy', 'Action', 'Adventure', 'Romance', 'Drama'];
+  // Debounce search input - chỉ gọi API sau 500ms user ngừng gõ
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(inputValue.trim());
+    }, 500);
 
-  const handleMoviePress = (movie: Movie) => {
+    return () => clearTimeout(timer);
+  }, [inputValue]);
+
+  const handleMoviePress = useCallback((movie: any) => {
     router.push({
       pathname: '/phim/[id]',
-      params: { id: movie.id },
+      params: { id: movie.slug },
     });
-  };
+  }, []);
 
-  const filteredMovies = movies.filter((movie) => {
-    const matchesSearch =
-      searchQuery === '' ||
-      movie.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      movie.titleChinese.includes(searchQuery) ||
-      movie.description.toLowerCase().includes(searchQuery.toLowerCase());
+  const handleClearSearch = useCallback(() => {
+    setInputValue('');
+    setDebouncedQuery('');
+  }, []);
 
-    const matchesGenre =
-      !selectedGenre ||
-      selectedGenre === 'All' ||
-      movie.genre.includes(selectedGenre);
+  const filteredMovies = data?.data || [];
 
-    return matchesSearch && matchesGenre;
-  });
+  const isDark = colorScheme === 'dark';
+  const showLoading = isLoading && debouncedQuery.length > 0;
+  const showEmpty = !isLoading && debouncedQuery.length > 0 && filteredMovies.length === 0;
+  const showResults = filteredMovies.length > 0;
 
   return (
     <ThemedView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <ThemedText type="title">Search</ThemedText>
+        <ThemedText type="title">Tìm kiếm</ThemedText>
       </View>
 
       {/* Search Input */}
       <View style={styles.searchContainer}>
-        <TextInput
-        
-          style={[
-            styles.searchInput,
-            {
-              backgroundColor: colorScheme === 'dark' ? '#1a1a1a' : '#f0f0f0',
-              color: colorScheme === 'dark' ? Colors.dark.text : Colors.light.text,
-            },
-          ]}
-          placeholder="Search movies..."
-          placeholderTextColor={colorScheme === 'dark' ? '#666' : '#999'}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
-
-      {/* Genre Filter */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.genreScroll}
-        contentContainerStyle={styles.genreContainer}
-      >
-        {genres.map((genre) => (
-          <Pressable
-            key={genre}
+        <View style={styles.searchInputWrapper}>
+          <IconSymbol 
+            name="magnifyingglass" 
+            size={20} 
+            color={isDark ? '#666' : '#999'} 
+            style={styles.searchIcon}
+          />
+          <TextInput
             style={[
-              styles.genreChip,
-              selectedGenre === genre && styles.genreChipActive,
+              styles.searchInput,
               {
-                backgroundColor:
-                  selectedGenre === genre
-                    ? colorScheme === 'dark'
-                      ? Colors.dark.tint
-                      : Colors.light.tint
-                    : colorScheme === 'dark'
-                    ? '#1a1a1a'
-                    : '#f0f0f0',
+                backgroundColor: isDark ? '#1a1a1a' : '#f0f0f0',
+                color: isDark ? Colors.dark.text : Colors.light.text,
               },
             ]}
-            onPress={() => setSelectedGenre(genre)}
-          >
-            <ThemedText
-              style={[
-                styles.genreText,
-                selectedGenre === genre && styles.genreTextActive,
-              ]}
-            >
-              {genre}
+            placeholder="Tìm kiếm phim, diễn viên..."
+            placeholderTextColor={isDark ? '#666' : '#999'}
+            value={inputValue}
+            onChangeText={setInputValue}
+            autoCorrect={false}
+            autoCapitalize="none"
+            returnKeyType="search"
+          />
+          {inputValue.length > 0 ? (
+            <Pressable onPress={handleClearSearch} style={styles.clearButton}>
+              <IconSymbol name="xmark.circle.fill" size={20} color={isDark ? '#666' : '#999'} />
+            </Pressable>
+          ) : null}
+        </View>
+
+        {/* Search Info */}
+        {debouncedQuery.length > 0 ? (
+          <View style={styles.searchInfo}>
+            <ThemedText style={styles.searchInfoText}>
+              {isLoading ? 'Đang tìm kiếm...' : `Tìm thấy ${filteredMovies.length} kết quả`}
             </ThemedText>
-          </Pressable>
-        ))}
-      </ScrollView>
+          </View>
+        ) : null}
+      </View>
 
       {/* Results */}
-      <ScrollView style={styles.resultsScroll}>
-        <View style={styles.resultsGrid}>
-          {filteredMovies.length > 0 ? (
-            filteredMovies.map((movie) => (
-              <View key={movie.id} style={styles.movieCardWrapper}>
-                <MovieCard
-                  movie={movie}
-                  width={160}
+      <ScrollView 
+        style={styles.resultsScroll}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Loading State */}
+        {showLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={isDark ? '#ff6b81' : '#ff4757'} />
+            <ThemedText style={styles.loadingText}>Đang tìm kiếm...</ThemedText>
+          </View>
+        ) : null}
+
+        {/* Error State */}
+        {isError ? (
+          <View style={styles.emptyState}>
+            <IconSymbol name="exclamationmark.triangle.fill" size={48} color="#f59e0b" />
+            <ThemedText style={[styles.emptyText, { marginTop: 16 }]}>
+              Không thể tải dữ liệu
+            </ThemedText>
+            <ThemedText style={[styles.emptySubText, { opacity: 0.6 }]}>
+              Vui lòng thử lại sau
+            </ThemedText>
+          </View>
+        ) : null}
+
+        {/* Empty State */}
+        {showEmpty && !isError ? (
+          <View style={styles.emptyState}>
+            <IconSymbol name="magnifyingglass" size={48} color={isDark ? '#666' : '#999'} />
+            <ThemedText style={[styles.emptyText, { marginTop: 16 }]}>
+              Không tìm thấy kết quả
+            </ThemedText>
+            <ThemedText style={[styles.emptySubText, { opacity: 0.6 }]}>
+              Thử tìm kiếm với từ khóa khác
+            </ThemedText>
+          </View>
+        ) : null}
+
+        {/* Initial State - no search yet */}
+        {!debouncedQuery && !isLoading && !isError ? (
+          <View style={styles.emptyState}>
+            <IconSymbol name="film" size={48} color={isDark ? '#666' : '#999'} />
+            <ThemedText style={[styles.emptyText, { marginTop: 16 }]}>
+              Tìm kiếm phim yêu thích
+            </ThemedText>
+            <ThemedText style={[styles.emptySubText, { opacity: 0.6 }]}>
+              Nhập tên phim, diễn viên hoặc mô tả
+            </ThemedText>
+          </View>
+        ) : null}
+
+        {/* Results Grid */}
+        {showResults && !isLoading && !isError ? (
+          <View style={styles.resultsGrid}>
+            {filteredMovies.map((movie: any) => (
+              <View key={movie._id} style={styles.movieCardWrapper}>
+                <AnimeCard
+                  anime={movie}
                   onPress={() => handleMoviePress(movie)}
                 />
               </View>
-            ))
-          ) : (
-            <View style={styles.emptyState}>
-              <ThemedText style={styles.emptyText}>No movies found</ThemedText>
-            </View>
-          )}
-        </View>
+            ))}
+          </View>
+        ) : null}
       </ScrollView>
     </ThemedView>
   );
@@ -131,18 +169,43 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 16,
-    paddingTop: 48,
+    paddingTop: 12,
     paddingBottom: 12,
   },
   searchContainer: {
     paddingHorizontal: 16,
     marginBottom: 16,
   },
+  searchInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  searchIcon: {
+    position: 'absolute',
+    left: 16,
+    zIndex: 1,
+  },
   searchInput: {
+    flex: 1,
     height: 50,
     borderRadius: 12,
-    paddingHorizontal: 16,
+    paddingLeft: 48,
+    paddingRight: 48,
     fontSize: 16,
+  },
+  clearButton: {
+    position: 'absolute',
+    right: 16,
+    padding: 4,
+  },
+  searchInfo: {
+    marginTop: 8,
+    paddingHorizontal: 4,
+  },
+  searchInfoText: {
+    fontSize: 14,
+    opacity: 0.7,
   },
   genreScroll: {
     maxHeight: 50,
@@ -175,19 +238,38 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     paddingHorizontal: 16,
     paddingBottom: 20,
+    justifyContent: 'space-between',
   },
   movieCardWrapper: {
-    marginBottom: 16,
+    width: '48%',
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
+    gap: 16,
+  },
+  loadingText: {
+    fontSize: 16,
+    opacity: 0.7,
   },
   emptyState: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 60,
+    paddingVertical: 80,
+    paddingHorizontal: 32,
   },
   emptyText: {
-    fontSize: 16,
-    opacity: 0.5,
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  emptySubText: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 8,
   },
 });
 

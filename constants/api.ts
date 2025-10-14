@@ -7,7 +7,8 @@ export { API_BASE_URL };
 // API Endpoints
 export const API_ENDPOINTS = {
   // Anime endpoints
-  ANIME: {
+  ANIME: {  
+    ALL: '/categorys',
     LATEST: '/category/latest/next',
     POPULAR: '/category/filters',
     BY_SLUG: '/category',

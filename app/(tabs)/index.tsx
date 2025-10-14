@@ -1,24 +1,42 @@
-import { StyleSheet, ScrollView, View, StatusBar, Pressable, ActivityIndicator, Text } from 'react-native';
+import { StyleSheet, ScrollView, View, StatusBar, Pressable, ActivityIndicator, Text, RefreshControl } from 'react-native';
 import { router } from 'expo-router';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { FeaturedBanner } from '@/components/featured-banner';
 import { AnimeSection } from '@/components/anime-section';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { series } from '@/data/series';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 import { useAnime } from '@/hooks/api';
 import { usePoster } from '@/hooks/api/use-poster';
-import React from 'react';
+import React, { useState, useCallback } from 'react';
+import { Bell } from 'lucide-react-native';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function HomeScreen() {
   const { data: animeData, isLoading, isError } = useAnime();
   const { data: posterData, isLoading: isPosterLoading, isError: isPosterError } = usePoster();
   const colorScheme = useColorScheme();
+  const queryClient = useQueryClient();
+  const [refreshing, setRefreshing] = useState(false);
   const featuredSeries = series.find((s) => s.isFeatured) || series[0];
   // Convert series to Movie format for FeaturedBanner compatibility
 
+  // Pull to refresh handler
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      // Invalidate và refetch tất cả queries
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['anime'] }),
+        queryClient.invalidateQueries({ queryKey: ['poster'] })
+      ]);
+    } catch (error) {
+      console.error('Refresh error:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [queryClient]);
 
   const handleFeaturedPress = () => {
     if (featuredSeries) {
@@ -42,16 +60,11 @@ export default function HomeScreen() {
           <ThemedText style={styles.headerSubtitle}>
             中国动画
           </ThemedText>
-          <View className='bg-red-500'><Text>Hello Tailwind</Text></View>
         </View>
 
         <View style={styles.headerRight}>
           <Pressable style={styles.iconButton}>
-            <IconSymbol
-              name="magnifyingglass"
-              size={24}
-              color={colorScheme === 'dark' ? Colors.dark.icon : Colors.light.icon}
-            />
+          <Bell size={18} color={colorScheme === 'dark' ? Colors.dark.icon : Colors.light.icon} />
           </Pressable>
         </View>
       </View>
@@ -59,6 +72,15 @@ export default function HomeScreen() {
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colorScheme === 'dark' ? Colors.dark.tint : Colors.light.tint}
+            colors={[colorScheme === 'dark' ? Colors.dark.tint : Colors.light.tint]}
+            progressBackgroundColor={colorScheme === 'dark' ? '#1f2937' : '#f3f4f6'}
+          />
+        }
       >
         {/* Featured Banner */}
         {posterData?.data && posterData?.data.data.length > 0 && (
@@ -87,7 +109,9 @@ export default function HomeScreen() {
           <AnimeSection
             title="🔥 Mới Cập Nhật"
             animes={animeData.data.data}
-            onSeeAllPress={() => router.push('/(tabs)')}
+            onSeeAllPress={() => router.push({
+              pathname: '/all/page',
+            })}
           />
         )}
 
@@ -113,13 +137,14 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    zIndex: -1,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 48,
+    paddingTop: 12,
     paddingBottom: 12,
   },
   headerLeft: {
@@ -130,9 +155,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   headerSubtitle: {
-    fontSize: 14,
+    fontSize: 12,
     opacity: 0.6,
-    marginTop: 2,
   },
   headerRight: {
     flexDirection: 'row',

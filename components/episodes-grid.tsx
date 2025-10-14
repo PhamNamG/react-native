@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Pressable } from 'react-native';
 import React from 'react';
 
 interface Episode {
@@ -30,17 +30,17 @@ export const EpisodesGrid: React.FC<EpisodesGridProps> = ({
 }) => {
   if (!episodes || episodes.length === 0) return null;
 
-  const columnWidth = columns === 5 ? '20%' : '16.66%';
+  const columnWidth = columns === 5 ? 'w-[20%]' : 'w-[16.66%]';
 
   return (
-    <View style={styles.container}>
+    <View className="mb-6">
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: isDark ? '#ffffff' : '#111827' }]}>
+      <View className="flex-row justify-between items-center mb-4">
+        <Text className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
           {title}
         </Text>
         {showCount && (
-          <Text style={[styles.count, { color: isDark ? '#9ca3af' : '#4b5563' }]}>
+          <Text className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
             {episodes.length} tập
           </Text>
         )}
@@ -48,54 +48,48 @@ export const EpisodesGrid: React.FC<EpisodesGridProps> = ({
 
       {/* Episodes Grid */}
       <ScrollView
-        style={[styles.scrollView, { maxHeight, backgroundColor: isDark ? '#1f2937' : '#f3f4f6' }]}
+        style={{ maxHeight }}
+        className={`rounded-xl p-2 ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled={true}
       >
-        <View style={styles.grid}>
+        <View className="flex-row flex-wrap -mx-1">
           {episodes
-            .sort((a, b) => parseInt(a.seri) - parseInt(b.seri))
-            .map((episode) => {
+            .sort((a, b) => {
+              const seriA = Number(a.seri) || 0;
+              const seriB = Number(b.seri) || 0;
+              return seriB - seriA;
+            })
+            .map((episode, index) => {
               const episodeSlug = episode.slug || episode._id || '';
               const isActive = currentSlug ? episodeSlug === currentSlug : false;
+              const uniqueKey = `${episode._id || episode.slug || 'ep'}-${index}`;
 
               return (
                 <View
-                  key={episodeSlug}
-                  style={[styles.episodeContainer, { width: columnWidth }]}
+                  key={uniqueKey}
+                  className={`px-1 mb-2 ${columnWidth}`}
                 >
                   <Pressable
                     onPress={() => onEpisodePress(episodeSlug)}
-                    style={({ pressed }) => [
-                      styles.episodeButton,
-                      {
-                        backgroundColor: isActive 
-                          ? '#dc2626' 
-                          : isDark 
-                            ? '#1f2937' 
-                            : '#ffffff',
-                        borderColor: isActive 
-                          ? '#dc2626' 
-                          : isDark 
-                            ? '#374151' 
-                            : '#d1d5db',
-                        opacity: pressed ? 0.8 : 1,
-                      }
-                    ]}
+                    className={`aspect-square items-center justify-center rounded-xl border-[0.5px] active:opacity-80 ${
+                      isActive 
+                        ? 'bg-red-600 border-red-600' 
+                        : isDark 
+                          ? 'bg-gray-800 border-gray-700' 
+                          : 'bg-white border-gray-300'
+                    }`}
                   >
                     <Text
-                      style={[
-                        styles.episodeText,
-                        { 
-                          color: isActive 
-                            ? '#ffffff' 
-                            : isDark 
-                              ? '#ffffff' 
-                              : '#111827' 
-                        }
-                      ]}
+                      className={`text-base font-extrabold ${
+                        isActive 
+                          ? 'text-white' 
+                          : isDark 
+                            ? 'text-white' 
+                            : 'text-gray-900'
+                      }`}
                     >
-                      {episode.seri}
+                      {episode.seri ? String(episode.seri) : '?'}
                     </Text>
                   </Pressable>
                 </View>
@@ -106,46 +100,3 @@ export const EpisodesGrid: React.FC<EpisodesGridProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 24,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  count: {
-    fontSize: 14,
-  },
-  scrollView: {
-    borderRadius: 12,
-    padding: 8,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: -4,
-  },
-  episodeContainer: {
-    paddingHorizontal: 4,
-    marginBottom: 8,
-  },
-  episodeButton: {
-    aspectRatio: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 12,
-    borderWidth: 0.5,
-  },
-  episodeText: {
-    fontSize: 16,
-    fontWeight: '800',
-  },
-});

@@ -8,6 +8,12 @@ export function useAnime() {
 	});
 }
 
+export function useAnimeAll(page: number) {
+	return useQuery<AnimeResponse>({
+		queryKey: ['animeAll'],
+		queryFn: () => animeApi.getAll(page),
+	});
+}
 export function useAnimeEp2d() {
 	return useQuery<AnimeResponse>({
 		queryKey: ['animeEp2d'],
@@ -44,10 +50,10 @@ export function useAnimeById(id: string) {
 	});
 }
 
-export function useSearchAnime(query: string, filters: { categories: string[], status: string }) {
+export function useSearchAnime(query: string) {
 	return useQuery({
-		queryKey: ['search', query, filters],
-		queryFn: () => animeApi.search(query, filters),
+		queryKey: ['search', query],
+		queryFn: () => animeApi.search(query),
 		enabled: query.length > 0,
 	});
 }

@@ -1,8 +1,10 @@
 import React from "react";
-import { ActivityIndicator, Text, useColorScheme, View, StyleSheet } from "react-native";
+import { ActivityIndicator, Text, View, StyleSheet } from "react-native";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 
 const Loading = () => {
-  const isDark = useColorScheme() === 'dark';
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   return (
     <View style={[styles.container, { backgroundColor: isDark ? '#030712' : '#ffffff' }]}>

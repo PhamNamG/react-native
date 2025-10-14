@@ -6,24 +6,37 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "channel": "development"
     },
     "preview": {
       "distribution": "internal",
+      "channel": "preview",
+      "resourceClass": "medium",
+      "node": "22.11.0",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
       },
       "env": {
-        "API_URL": "https://hh3d.id.vn/api"
+        "EXPO_PUBLIC_API_URL": "https://hh3d.id.vn/api",
+        "NODE_OPTIONS": "--max-old-space-size=4096",
+        "EXPO_NO_CAPABILITY_SYNC": "1",
+        "npm_config_optional": "true"
       }
     },
     "production": {
       "autoIncrement": true,
+      "channel": "production",
+      "resourceClass": "medium",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
       },
       "env": {
-        "API_URL": "https://hh3d.id.vn/api"
+        "EXPO_PUBLIC_API_URL": "https://hh3d.id.vn/api",
+        "NODE_OPTIONS": "--max-old-space-size=4096",
+        "EXPO_NO_CAPABILITY_SYNC": "1"
       }
     }
   },

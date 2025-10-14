@@ -8,40 +8,41 @@
     "scheme": "o3d",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
+    "runtimeVersion": "1.0.0",
+    "splash": {
+      "image": "./assets/images/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/c784b96c-0e74-4fac-9c84-e9654fe1cf2a"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.nampg.o3d"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.nampg.o3d"
+      "package": "com.nampg.o3d",
+      "jsEngine": "jsc"
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/icon.png"
     },
     "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ]
+      "expo-router"
     ],
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
       "eas": {
-        "projectId": "c784b96c-0e74-4fac-9c84-e9654fe1cf2a"
+        "projectId": "90333c20-3f35-4480-a490-1d9ab15eb0c1"
       }
     }
   }
