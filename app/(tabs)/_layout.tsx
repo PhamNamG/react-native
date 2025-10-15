@@ -29,21 +29,21 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: 'Trang chủ',
           tabBarIcon: ({ color }) => <Home size={20} color={color} />,
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
-          title: 'Search',
+          title: 'Tìm kiếm',
           tabBarIcon: ({ color }) => <Search size={20} color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
+          title: 'Cài đặt',
           tabBarIcon: ({ color }) => <SettingsIcon size={20} color={color} />,
         }}
       />

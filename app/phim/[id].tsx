@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useAnimeById } from '@/hooks/api';
 import { Ionicons } from '@expo/vector-icons';
-import { EpisodesGrid } from '@/components/episodes-grid';
+import { EpisodeTabs } from '@/components/phim/episode-tabs';
 import React, { useCallback, useState } from 'react';
 import { MovieDetailSkeleton } from '@/components/movie-detail-skeleton';
 import { Image } from 'expo-image';
@@ -12,9 +12,11 @@ import { BlurView } from 'expo-blur';
 import { useQueryClient } from '@tanstack/react-query';
 import { Colors } from '@/constants/Colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { MovieDescription } from '@/components/xem-phim/movie-description';
 
 export default function AnimeDetailScreen() {
   const insets = useSafeAreaInsets();
+  const [isExpanded, setIsExpanded] = useState(false);
   const { id } = useLocalSearchParams<{ id: string }>();
   const queryClient = useQueryClient();
   const { data, isLoading, isError }: any = useAnimeById(id);
@@ -77,7 +79,7 @@ export default function AnimeDetailScreen() {
     <View className="flex-1" style={{ backgroundColor: isDark ? '#181b24' : '#fff', paddingTop: insets.top }}>
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
 
-      <View className="h-[350px] relative">
+      <View className="h-[200px] relative">
         <Image
           source={{ uri: backdropImage }}
           style={styles.blurredImage}
@@ -207,36 +209,30 @@ export default function AnimeDetailScreen() {
             </Pressable>
           </View>
 
-          {/* Episodes Grid */}
+          {/* Episode Tabs */}
           {anime.products?.length > 0 && (
-            <View className="mb-6">
-              <EpisodesGrid
-                episodes={anime.products || []}
-                isDark={isDark}
-                title="Danh sách tập"
-                showCount={true}
-                maxHeight={280}
-                columns={6}
-                onEpisodePress={handleEpisodePress}
-              />
-            </View>
+            <EpisodeTabs
+              isDark={isDark}
+              episodes={anime.products || []}
+              gallery={anime.posters || []}
+              onEpisodePress={handleEpisodePress}
+            />
           )}
 
           {/* Description */}
-          {anime.des && (
-            <View className="mb-6">
-              <Text className={`text-xl font-bold mb-3 ${isDark ? 'text-white' : 'text-black'}`}>
-                Nội dung
-              </Text>
-              <Text className={`text-base leading-6 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                {anime.des}
-              </Text>
-            </View>
-          )}
+
+          <MovieDescription
+            isDark={isDark}
+            description={anime.des}
+            isExpanded={isExpanded}
+            onToggle={() => {
+              setIsExpanded(!isExpanded);
+            }}
+          />
 
           {/* Tags */}
           {anime.tags?.length > 0 && (
-            <View className="mb-6">
+            <View className={`mb-6 pb-6 border-b ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
               <Text className={`text-xl font-bold mb-3 ${isDark ? 'text-white' : 'text-black'}`}>
                 Thể loại
               </Text>

@@ -18,9 +18,9 @@ interface EpisodesGridProps {
   columns?: 5 | 6;
 }
 
-export const EpisodesGrid: React.FC<EpisodesGridProps> = ({ 
-  episodes, 
-  currentSlug, 
+export const EpisodesGrid: React.FC<EpisodesGridProps> = ({
+  episodes,
+  currentSlug,
   isDark,
   title = 'Danh sách tập',
   showCount = true,
@@ -35,16 +35,18 @@ export const EpisodesGrid: React.FC<EpisodesGridProps> = ({
   return (
     <View className="mb-6">
       {/* Header */}
-      <View className="flex-row justify-between items-center mb-4">
-        <Text className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-          {title}
-        </Text>
-        {showCount && (
-          <Text className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            {episodes.length} tập
+      {title && (
+        <View className="flex-row justify-between items-center mb-4">
+          <Text className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            {title}
           </Text>
-        )}
-      </View>
+          {showCount && (
+            <Text className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              {episodes.length} tập
+            </Text>
+          )}
+        </View>
+      )}
 
       {/* Episodes Grid */}
       <ScrollView
@@ -73,22 +75,20 @@ export const EpisodesGrid: React.FC<EpisodesGridProps> = ({
                 >
                   <Pressable
                     onPress={() => onEpisodePress(episodeSlug)}
-                    className={`aspect-square items-center justify-center rounded-xl border-[0.5px] active:opacity-80 ${
-                      isActive 
-                        ? 'bg-red-600 border-red-600' 
-                        : isDark 
-                          ? 'bg-gray-800 border-gray-700' 
+                    className={`aspect-square items-center justify-center rounded-xl border-[0.5px] active:opacity-80 ${isActive
+                        ? 'bg-red-600 border-red-600'
+                        : isDark
+                          ? 'bg-gray-800 border-gray-700'
                           : 'bg-white border-gray-300'
-                    }`}
+                      }`}
                   >
                     <Text
-                      className={`text-base font-extrabold ${
-                        isActive 
-                          ? 'text-white' 
-                          : isDark 
-                            ? 'text-white' 
+                      className={`text-base font-extrabold ${isActive
+                          ? 'text-white'
+                          : isDark
+                            ? 'text-white'
                             : 'text-gray-900'
-                      }`}
+                        }`}
                     >
                       {episode.seri ? String(episode.seri) : '?'}
                     </Text>

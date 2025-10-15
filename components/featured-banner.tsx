@@ -160,7 +160,7 @@ export function FeaturedBanner({ posters, onPosterPress }: FeaturedBannerProps) 
                 style={styles.playButton}
                 onPress={() => {
                   router.push({
-                    pathname: '/xem-phim/[id]',
+                    pathname: '/phim/[id]',
                     params: { id: slug },
                   });
                 }}

@@ -24,11 +24,11 @@ export default function NotificationPage() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useNotifications(1,20);
+  } = useNotifications(1, 20);
 
   const markAsRead = useMarkAsRead();
   const { unreadCount, decrementUnread } = useNotificationStore();
-  
+
   const notifications = data?.pages.flatMap(page => page.data) || [];
   const handleNotificationPress = (notification: Notification) => {
     // Mark as read
@@ -53,7 +53,6 @@ export default function NotificationPage() {
   };
 
   const renderNotification = ({ item }: { item: Notification }) => {
-    // Safe date parsing
     let timeAgo = 'Vừa xong';
     try {
       const sentDate = new Date(item.sentAt);
