@@ -8,7 +8,7 @@ interface MovieDetailSkeletonProps {
 
 export function MovieDetailSkeleton({ isDark = true }: MovieDetailSkeletonProps) {
   return (
-    <View style={[styles.container, { backgroundColor: isDark ? '#030712' : '#ffffff' }]}>
+    <View style={[styles.container, { backgroundColor: isDark ? '#181b24' : '#ffffff' }]}>
       {/* Backdrop Skeleton */}
       <View style={styles.backdropContainer}>
         <Skeleton width="100%" height={350} borderRadius={0} isDark={isDark} />

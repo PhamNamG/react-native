@@ -59,7 +59,7 @@ export default function AllPage() {
   return (
     <ThemedView style={styles.container}>
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: isDark ? '#0a0a0a' : '#fff' }]}>
+      <View style={[styles.header]}>
         <Pressable onPress={handleBack} style={styles.backButton}>
           <IconSymbol 
             name="chevron.left" 

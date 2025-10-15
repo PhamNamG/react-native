@@ -1,13 +1,13 @@
-import { StyleSheet, View, Pressable, ScrollView, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Pressable, ScrollView, ActivityIndicator, Modal } from 'react-native';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { NotificationSettings } from '@/components/notification-settings';
 import { Colors } from '@/constants/theme';
 import React, { useState } from 'react';
 import { useThemeStorage } from '@/hooks';
-
+import { Bell, ChevronRight, Moon, Smartphone, Sun, XCircle } from 'lucide-react-native';
 interface MenuItemProps {
-  icon: string;
+  icon: React.ReactNode;
   title: string;
   subtitle?: string;
   onPress?: () => void;
@@ -16,24 +16,6 @@ interface MenuItemProps {
 }
 
 function MenuItem({ icon, title, subtitle, onPress, disabled = false, colorScheme }: MenuItemProps) {
-
-  // Map icon string to IconSymbol name
-  const getIconName = (iconName: string): any => {
-    const iconMap: Record<string, string> = {
-      'heart': 'heart.fill',
-      'bookmark': 'bookmark.fill',
-      'clock': 'clock.fill',
-      'bell': 'bell.fill',
-      'globe': 'globe',
-      'moon': 'moon.fill',
-      'sun': 'sun.max.fill',
-      'circle.half': 'circle.lefthalf.filled',
-      'info': 'info.circle',
-      'help': 'questionmark.circle',
-      'shield': 'shield.fill',
-    };
-    return iconMap[iconName] || 'house.fill';
-  };
 
   const isDark = colorScheme === 'dark';
 
@@ -59,11 +41,7 @@ function MenuItem({ icon, title, subtitle, onPress, disabled = false, colorSchem
             },
           ]}
         >
-          <IconSymbol
-            name={getIconName(icon)}
-            size={20}
-            color={isDark ? Colors.dark.tint : Colors.light.tint}
-          />
+            {icon}
         </View>
         <View style={styles.menuItemText}>
           <ThemedText style={styles.menuItemTitle}>{title}</ThemedText>
@@ -72,24 +50,23 @@ function MenuItem({ icon, title, subtitle, onPress, disabled = false, colorSchem
           )}
         </View>
       </View>
-      <IconSymbol
-        name="chevron.right"
-        size={20}
-        color={isDark ? '#666' : '#999'}
-      />
+      <View style={{ justifyContent: 'flex-end', alignItems: 'flex-end' }}>
+        <ChevronRight size={20} color={isDark ? '#666' : '#999'} />
+      </View>
     </Pressable>
   );
 }
 
 export default function ProfileScreen() {
-  const { 
-    colorScheme, 
-    themePreference, 
-    isLoading, 
-    toggleTheme 
+  const {
+    colorScheme,
+    themePreference,
+    isLoading,
+    toggleTheme
   } = useThemeStorage();
-  
+
   const [isChangingTheme, setIsChangingTheme] = useState(false);
+  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
 
   const handleToggleTheme = async () => {
     if (isChangingTheme) return;
@@ -98,7 +75,7 @@ export default function ProfileScreen() {
 
     try {
       await toggleTheme();
-      
+
       // Small delay for better UX
       setTimeout(() => {
         setIsChangingTheme(false);
@@ -112,17 +89,17 @@ export default function ProfileScreen() {
   const getThemeDisplayInfo = () => {
     if (themePreference === 'system') {
       return {
-        icon: 'circle.half',
+        icon: <Smartphone size={20} color={colorScheme === 'dark' ? Colors.dark.tint : Colors.light.tint} />,
         subtitle: `Auto (${colorScheme === 'dark' ? 'Dark' : 'Light'})`,
       };
     } else if (themePreference === 'light') {
       return {
-        icon: 'sun',
+        icon: <Sun size={20} color={colorScheme === 'dark' ? Colors.dark.tint : Colors.light.tint} />,
         subtitle: 'Light Mode',
       };
     } else {
       return {
-        icon: 'moon',
+        icon: <Moon size={20} color={colorScheme === 'dark' ? Colors.dark.tint : Colors.light.tint} />,
         subtitle: 'Dark Mode',
       };
     }
@@ -170,6 +147,14 @@ export default function ProfileScreen() {
           <ThemedText style={styles.sectionTitle}>Settings</ThemedText>
 
           <MenuItem
+            icon={<Bell size={20} color={colorScheme === 'dark' ? Colors.dark.tint : Colors.light.tint} />}
+            title="Notifications"
+            subtitle="Quản lý thông báo"
+            onPress={() => setShowNotificationSettings(true)}
+            colorScheme={colorScheme}
+          />
+
+          <MenuItem
             icon={themeInfo.icon}
             title="Appearance"
             subtitle={isChangingTheme ? 'Changing...' : themeInfo.subtitle}
@@ -181,6 +166,26 @@ export default function ProfileScreen() {
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
+
+      {/* Notification Settings Modal */}
+      <Modal
+        visible={showNotificationSettings}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowNotificationSettings(false)}
+      >
+        <ThemedView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <ThemedText type="subtitle" style={styles.modalTitle}>
+              Cài đặt thông báo
+            </ThemedText>
+            <Pressable onPress={() => setShowNotificationSettings(false)}>
+              <XCircle size={28} color={isDark ? '#999' : '#666'} />
+            </Pressable>
+          </View>
+          <NotificationSettings />
+        </ThemedView>
+      </Modal>
     </ThemedView>
   );
 }
@@ -275,5 +280,21 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: 32,
+  },
+  modalContainer: {
+    flex: 1,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.1)',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
   },
 });

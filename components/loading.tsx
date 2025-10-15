@@ -7,7 +7,7 @@ const Loading = () => {
   const isDark = colorScheme === 'dark';
 
   return (
-    <View style={[styles.container, { backgroundColor: isDark ? '#030712' : '#ffffff' }]}>
+    <View style={[styles.container, { backgroundColor: isDark ? '#181b24' : '#ffffff' }]}>
       <ActivityIndicator 
         size="large" 
         color="#ff4757" 

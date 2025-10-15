@@ -11,8 +11,10 @@ import { Image } from 'expo-image';
 import { BlurView } from 'expo-blur';
 import { useQueryClient } from '@tanstack/react-query';
 import { Colors } from '@/constants/Colors';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AnimeDetailScreen() {
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
   const queryClient = useQueryClient();
   const { data, isLoading, isError }: any = useAnimeById(id);
@@ -48,7 +50,7 @@ export default function AnimeDetailScreen() {
 
   if (isError || !anime) {
     return (
-      <View className={`flex-1 justify-center items-center px-4 ${isDark ? 'bg-gray-950' : 'bg-white'}`}>
+      <View className={`flex-1 justify-center items-center px-4`} style={{ backgroundColor: isDark ? '#181b24' : '#fff' }}>
         <Text className={`text-xl mb-6 text-center ${isDark ? 'text-white' : 'text-black'}`}>
           ⚠️ Không tìm thấy phim!
         </Text>
@@ -72,7 +74,7 @@ export default function AnimeDetailScreen() {
   };
 
   return (
-    <View className={`flex-1 ${isDark ? 'bg-gray-950' : 'bg-white'}`}>
+    <View className="flex-1" style={{ backgroundColor: isDark ? '#181b24' : '#fff', paddingTop: insets.top }}>
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
 
       <View className="h-[350px] relative">
@@ -89,7 +91,7 @@ export default function AnimeDetailScreen() {
         />
 
         <LinearGradient
-          colors={['rgba(0,0,0,0.1)', isDark ? '#030712' : '#ffffff']}
+          colors={['rgba(0,0,0,0.1)', isDark ? '#181b24' : '#ffffff']}
           locations={[0.6, 1]}
           style={styles.blurContainer}
         >

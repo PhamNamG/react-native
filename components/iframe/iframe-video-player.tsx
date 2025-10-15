@@ -1,6 +1,5 @@
 import { View, Pressable, Dimensions, StyleSheet, Text } from 'react-native';
 import { useState } from 'react';
-import { VideoPlayerControls } from './video-player-controls';
 import React from 'react';
 import { WebView } from 'react-native-webview';
 

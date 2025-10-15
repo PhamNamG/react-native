@@ -13,6 +13,43 @@ const api: AxiosInstance = axios.create({
   headers: DEFAULT_HEADERS,
 });
 
+// // Debug: Log API requests
+// api.interceptors.request.use(
+//   (config) => {
+//     console.log('🌐 API Request:', {
+//       method: config.method?.toUpperCase(),
+//       url: config.baseURL + config.url,
+//       data: config.data,
+//     });
+//     return config;
+//   },
+//   (error) => {
+//     console.error('❌ Request Error:', error);
+//     return Promise.reject(error);
+//   }
+// );
+
+// // Debug: Log API responses
+// api.interceptors.response.use(
+//   (response) => {
+//     console.log('✅ API Response:', {
+//       status: response.status,
+//       url: response.config.url,
+//       data: response.data,
+//     });
+//     return response;
+//   },
+//   (error) => {
+//     console.error('❌ Response Error:', {
+//       status: error.response?.status,
+//       url: error.config?.url,
+//       data: error.response?.data,
+//       message: error.message,
+//     });
+//     return Promise.reject(error);
+//   }
+// );
+
 /**
  * Request Interceptor
  * Adds authentication token to requests

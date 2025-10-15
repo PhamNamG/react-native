@@ -9,9 +9,10 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 import { useAnime } from '@/hooks/api';
 import { usePoster } from '@/hooks/api/use-poster';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Bell } from 'lucide-react-native';
 import { useQueryClient } from '@tanstack/react-query';
+import { useNotificationStore } from '@/stores/notification-store';
 
 export default function HomeScreen() {
   const { data: animeData, isLoading, isError } = useAnime();
@@ -20,9 +21,14 @@ export default function HomeScreen() {
   const queryClient = useQueryClient();
   const [refreshing, setRefreshing] = useState(false);
   const featuredSeries = series.find((s) => s.isFeatured) || series[0];
-  // Convert series to Movie format for FeaturedBanner compatibility
 
-  // Pull to refresh handler
+  // Notification store
+  const { unreadCount, fetchUnreadCount } = useNotificationStore();
+
+  useEffect(() => {
+    fetchUnreadCount();
+  }, []);
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
@@ -41,7 +47,7 @@ export default function HomeScreen() {
   const handleFeaturedPress = () => {
     if (featuredSeries) {
       router.push({
-        pathname: '/series/[id]',
+        pathname: '/xem-phim/[id]',
         params: { id: featuredSeries.id },
       });
     }
@@ -51,24 +57,6 @@ export default function HomeScreen() {
       <StatusBar
         barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
       />
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <ThemedText type="title" style={styles.headerTitle}>
-            Ổ 3D
-          </ThemedText>
-          <ThemedText style={styles.headerSubtitle}>
-            中国动画
-          </ThemedText>
-        </View>
-
-        <View style={styles.headerRight}>
-          <Pressable style={styles.iconButton}>
-          <Bell size={18} color={colorScheme === 'dark' ? Colors.dark.icon : Colors.light.icon} />
-          </Pressable>
-        </View>
-      </View>
-
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -82,6 +70,35 @@ export default function HomeScreen() {
           />
         }
       >
+
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <ThemedText type="title" style={styles.headerTitle}>
+              Ổ 3D
+            </ThemedText>
+            <ThemedText style={styles.headerSubtitle}>
+              中国动画
+            </ThemedText>
+          </View>
+
+          <View style={styles.headerRight}>
+            <Pressable
+              style={styles.iconButton}
+              onPress={() => router.push({
+                pathname: '/notification/page',
+              })}
+            >
+              <Bell size={18} color={colorScheme === 'dark' ? Colors.dark.icon : Colors.light.icon} />
+              {unreadCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </Text>
+                </View>
+              )}
+            </Pressable>
+          </View>
+        </View>
         {/* Featured Banner */}
         {posterData?.data && posterData?.data.data.length > 0 && (
           <FeaturedBanner
@@ -169,6 +186,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(128, 128, 128, 0.1)',
+    position: 'relative',
+  },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#ef4444',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    paddingHorizontal: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: 'bold',
   },
   scrollView: {
     flex: 1,

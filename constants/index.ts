@@ -1,6 +1,5 @@
-// API URLs
-export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.0.102:8001/api';
-// API Endpoints
+export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+
 export const API_ENDPOINTS = {
   CATEGORY: '/category',
   PRODUCT: '/product',
@@ -8,9 +7,12 @@ export const API_ENDPOINTS = {
   CATEGORY_SITEMAP: '/categorys/sitemap',
   POSTER: '/poster',
   ANIME_POPULAR: '/category/filters',
+  PUSH_TOKEN_REGISTER: '/push-token/register',
+  PUSH_TOKEN_UNREGISTER: '/push-token/unregister',
+  NOTIFICATIONS: '/notifications/device',
+  NOTIFICATIONS_UNREAD_COUNT: '/notifications/device/unread-count',
 } as const;
 
-// Cache Settings
 export const CACHE_SETTINGS = {
   NO_CACHE: 'no-cache',
   REVALIDATE_15: 15,

@@ -22,14 +22,10 @@
 // Axios client (recommended for most use cases)
 export { default as api } from './config/api.config';
 
-// Fetch-based client
-export * from './client';
 
 // Services
 export * from './services';
 
-// Types
-export type { ApiResponse, ApiError } from './client';
 
 
 

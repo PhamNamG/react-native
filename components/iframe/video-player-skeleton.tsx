@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Skeleton } from './skeleton';
+import { Skeleton } from '../skeleton';
 
 interface VideoPlayerSkeletonProps {
   isDark?: boolean;
@@ -8,7 +8,7 @@ interface VideoPlayerSkeletonProps {
 
 export function VideoPlayerSkeleton({ isDark = true }: VideoPlayerSkeletonProps) {
   return (
-    <View style={[styles.container, { backgroundColor: isDark ? '#030712' : '#f9fafb' }]}>
+    <View style={[styles.container, { backgroundColor: isDark ? '#181b24' : '#f9fafb' }]}>
       {/* Video Player Skeleton */}
       <View style={styles.videoContainer}>
         <Skeleton width="100%" height="100%" borderRadius={0} isDark={isDark} />

@@ -40,6 +40,11 @@ export const API_ENDPOINTS = {
   },
   REPORTS: {
     CREATE: '/reports'
+  },
+
+  NOTIFICATION: {
+    DEVICE_HISTORY: '/notifications/device/history',
+    DEVICE_UNREAD: '/notifications/device/unread-count',
   }
 } as const;
 

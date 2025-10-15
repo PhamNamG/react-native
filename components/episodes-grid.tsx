@@ -49,7 +49,8 @@ export const EpisodesGrid: React.FC<EpisodesGridProps> = ({
       {/* Episodes Grid */}
       <ScrollView
         style={{ maxHeight }}
-        className={`rounded-xl p-2 ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}
+        className={`rounded-xl ${isDark ? 'bg-gray-900' : 'bg-gray-100'}`}
+        contentContainerStyle={{ padding: 8 }}
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled={true}
       >

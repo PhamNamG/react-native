@@ -3,11 +3,12 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useAnimeEpisodeById } from '@/hooks';
-import { IframeVideoPlayer } from '@/components/iframe-video-player';
+import { IframeVideoPlayer } from '@/components/iframe/iframe-video-player';
 import { EpisodesGrid } from '@/components/episodes-grid';
 import React, { useState, useMemo, useEffect } from 'react';
-import { VideoPlayerSkeleton } from '@/components/video-player-skeleton';
+import { VideoPlayerSkeleton } from '@/components/iframe/video-player-skeleton';
 import { ThemedText } from '@/components/themed-text';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface ServerOption {
   id: string;
@@ -21,7 +22,7 @@ export default function MoviePlayerScreen() {
   const { data, isLoading, isError }: any = useAnimeEpisodeById(id);
   const colorScheme = useColorScheme();
   const [selectedServerId, setSelectedServerId] = useState<string | null>(null);
-
+  const insets = useSafeAreaInsets();
   // Reset server khi chuyển episode
   useEffect(() => {
     setSelectedServerId(null);
@@ -38,9 +39,9 @@ export default function MoviePlayerScreen() {
   // Tạo danh sách servers có sẵn - PHẢI ở top level trước early returns
   const availableServers: ServerOption[] = useMemo(() => {
     if (!episode) return [];
-    
+
     const servers: ServerOption[] = [];
-    
+
     // Ưu tiên 1: voiceOverLink (Thuyết minh)
     if (episode.voiceOverLink) {
       servers.push({
@@ -50,7 +51,7 @@ export default function MoviePlayerScreen() {
         priority: 1,
       });
     }
-    
+
     // Ưu tiên 2: voiceOverLink2
     if (episode.voiceOverLink2) {
       servers.push({
@@ -60,7 +61,7 @@ export default function MoviePlayerScreen() {
         priority: 2,
       });
     }
-    
+
     // Ưu tiên 3: dailyMotionServer
     if (episode.dailyMotionServer) {
       servers.push({
@@ -70,7 +71,7 @@ export default function MoviePlayerScreen() {
         priority: 3,
       });
     }
-    
+
     // Ưu tiên 4: server2
     if (episode.server2) {
       servers.push({
@@ -80,7 +81,7 @@ export default function MoviePlayerScreen() {
         priority: 4,
       });
     }
-    
+
     // Ưu tiên 5: link
     if (episode.link) {
       servers.push({
@@ -90,16 +91,16 @@ export default function MoviePlayerScreen() {
         priority: 5,
       });
     }
-    
+
     return servers.sort((a, b) => a.priority - b.priority);
   }, [episode]);
 
   // Chọn server mặc định
   const defaultServer = availableServers[0];
-  const currentServer = selectedServerId 
+  const currentServer = selectedServerId
     ? availableServers.find(s => s.id === selectedServerId) || defaultServer
     : defaultServer;
-  
+
   const videoUrl = currentServer?.url || '';
 
   const handleBack = () => {
@@ -117,15 +118,14 @@ export default function MoviePlayerScreen() {
 
   if (isError || !data?.data) {
     return (
-      <View style={[styles.errorContainer, { backgroundColor: '#030712' }]}>
+      <View style={[styles.errorContainer, { backgroundColor: '#181b24' }]}>
         <Text style={styles.errorText}>Không tìm thấy tập phim</Text>
       </View>
     );
   }
-  
+
   return (
-    <View style={[styles.container, { backgroundColor: isDark ? '#030712' : '#f9fafb' }]}>
-      <StatusBar hidden />
+    <View style={[styles.container, { backgroundColor: isDark ? '#181b24' : '#f9fafb', paddingTop: insets.top }]} >
 
       {/* Video Player hoặc Error Message */}
       {videoUrl ? (
@@ -153,8 +153,8 @@ export default function MoviePlayerScreen() {
               Chọn Server
             </Text>
           </View>
-          <ScrollView 
-            horizontal 
+          <ScrollView
+            horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.serverList}
           >
@@ -167,11 +167,11 @@ export default function MoviePlayerScreen() {
                   style={[
                     styles.serverButton,
                     {
-                      backgroundColor: isActive 
-                        ? '#dc2626' 
+                      backgroundColor: isActive
+                        ? '#dc2626'
                         : isDark ? '#1f2937' : '#f3f4f6',
-                      borderColor: isActive 
-                        ? '#dc2626' 
+                      borderColor: isActive
+                        ? '#dc2626'
                         : isDark ? '#374151' : '#e5e7eb',
                     }
                   ]}
@@ -192,7 +192,7 @@ export default function MoviePlayerScreen() {
 
       {/* Movie Details */}
       <ScrollView
-        style={[styles.scrollView, { backgroundColor: isDark ? '#030712' : '#f9fafb' }]}
+        style={[styles.scrollView, { backgroundColor: isDark ? '#181b24' : '#f9fafb' }]}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.content}>
@@ -250,8 +250,8 @@ export default function MoviePlayerScreen() {
                 <Text style={styles.langText}>{String(seriesData.lang)}</Text>
               </View>
             ) : null}
-            {seriesData?.tags && Array.isArray(seriesData.tags) ? 
-              seriesData.tags.map((tag: any) => 
+            {seriesData?.tags && Array.isArray(seriesData.tags) ?
+              seriesData.tags.map((tag: any) =>
                 tag?._id && tag?.name ? (
                   <View
                     key={tag._id}

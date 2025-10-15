@@ -3,7 +3,7 @@
  * All series-related API calls
  */
 
-import { get, post } from '../client';
+import { baseApi } from './base.api';
 import { Series, Category, Episode } from '@/types/movie';
 
 export interface GetSeriesParams {
@@ -36,70 +36,70 @@ export async function getSeries(params?: GetSeriesParams): Promise<GetSeriesResp
   const query = searchParams.toString();
   const endpoint = `/series${query ? `?${query}` : ''}`;
   
-  return get<GetSeriesResponse>(endpoint);
+  return baseApi.get<GetSeriesResponse>(endpoint);
 }
 
 /**
  * Get series by ID
  */
 export async function getSeriesById(id: string): Promise<Series> {
-  return get<Series>(`/series/${id}`);
+  return baseApi.get<Series>(`/series/${id}`);
 }
 
 /**
  * Get series categories
  */
 export async function getSeriesCategories(): Promise<Category[]> {
-  return get<Category[]>('/series/categories');
+  return baseApi.get<Category[]>('/series/categories');
 }
 
 /**
  * Get category by ID
  */
 export async function getCategoryById(id: string): Promise<Category> {
-  return get<Category>(`/series/categories/${id}`);
+  return baseApi.get<Category>(`/series/categories/${id}`);
 }
 
 /**
  * Get featured series
  */
 export async function getFeaturedSeries(): Promise<Series[]> {
-  return get<Series[]>('/series/featured');
+  return baseApi.get<Series[]>('/series/featured');
 }
 
 /**
  * Get trending series
  */
 export async function getTrendingSeries(): Promise<Series[]> {
-  return get<Series[]>('/series/trending');
+  return baseApi.get<Series[]>('/series/trending');
 }
 
 /**
  * Get new series
  */
 export async function getNewSeries(): Promise<Series[]> {
-  return get<Series[]>('/series/new');
+  return baseApi.get<Series[]>('/series/new');
 }
 
 /**
  * Search series
  */
 export async function searchSeries(query: string): Promise<Series[]> {
-  return get<Series[]>(`/series/search?q=${encodeURIComponent(query)}`);
+  return baseApi.get<Series[]>(`/series/search?q=${encodeURIComponent(query)}`);
 }
 
 /**
  * Get episodes for a series
  */
 export async function getSeriesEpisodes(seriesId: string): Promise<Episode[]> {
-  return get<Episode[]>(`/series/${seriesId}/episodes`);
+  return baseApi.get<Episode[]>(`/series/${seriesId}/episodes`);
 }
 
 /**
  * Get episode by ID
  */
 export async function getEpisodeById(seriesId: string, episodeId: string): Promise<Episode> {
-  return get<Episode>(`/series/${seriesId}/episodes/${episodeId}`);
+  return baseApi.get<Episode>(`/series/${seriesId}/episodes/${episodeId}`);
 }
 
 /**
@@ -109,28 +109,28 @@ export async function markEpisodeWatched(
   seriesId: string,
   episodeId: string
 ): Promise<{ success: boolean }> {
-  return post<{ success: boolean }>(`/series/${seriesId}/episodes/${episodeId}/watch`, {});
+  return baseApi.post<{ success: boolean }>(`/series/${seriesId}/episodes/${episodeId}/watch`, {});
 }
 
 /**
  * Add series to watchlist
  */
 export async function addSeriesToWatchlist(seriesId: string): Promise<{ success: boolean }> {
-  return post<{ success: boolean }>('/watchlist/series', { seriesId });
+  return baseApi.post<{ success: boolean }>('/watchlist/series', { seriesId });
 }
 
 /**
  * Remove series from watchlist
  */
 export async function removeSeriesFromWatchlist(seriesId: string): Promise<{ success: boolean }> {
-  return post<{ success: boolean }>('/watchlist/series/remove', { seriesId });
+  return baseApi.post<{ success: boolean }>('/watchlist/series/remove', { seriesId });
 }
 
 /**
  * Rate a series
  */
 export async function rateSeries(seriesId: string, rating: number): Promise<{ success: boolean }> {
-  return post<{ success: boolean }>(`/series/${seriesId}/rate`, { rating });
+  return baseApi.post<{ success: boolean }>(`/series/${seriesId}/rate`, { rating });
 }
 
 

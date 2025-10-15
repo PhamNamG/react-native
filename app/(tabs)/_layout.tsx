@@ -16,7 +16,6 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme].tint,
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: isDark ? '#0a0a0a' : '#fff',
           borderTopWidth: 1,
           borderTopColor: isDark ? '#2a2a2a' : '#e0e0e0',
           height: 60 + insets.bottom,

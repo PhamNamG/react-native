@@ -8,6 +8,7 @@ import Swiper from 'react-native-swiper';
 import { useRef, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
+import { router } from 'expo-router';
   
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BANNER_HEIGHT = SCREEN_WIDTH * 0.75;
@@ -30,7 +31,6 @@ export function FeaturedBanner({ posters, onPosterPress }: FeaturedBannerProps) 
   
   const buttonsOpacity = useRef(new Animated.Value(0)).current;
   const buttonsTranslateY = useRef(new Animated.Value(30)).current;
-
   // Staggered animation function
   const animateContent = () => {
     // Reset all animations
@@ -100,8 +100,7 @@ export function FeaturedBanner({ posters, onPosterPress }: FeaturedBannerProps) 
 
   const renderPosterItem = (poster: Poster) => {
     // Parse genres from type string
-    const genres = poster.type ? poster.type.split(',').map(g => g.trim()) : [];
-
+    const slug = poster.link.split('/').pop() || '';
     return (
       <Pressable 
         style={styles.slide} 
@@ -116,7 +115,7 @@ export function FeaturedBanner({ posters, onPosterPress }: FeaturedBannerProps) 
         />
         
         <LinearGradient
-          colors={isDark ? ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.1)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0.75)', 'rgba(0, 0, 0, 0.95)'] : ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.3)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0.75)', 'rgba(255, 255, 255, 0.95)']}
+          colors={isDark ? ['rgba(24, 27, 36, 0)', 'rgba(24, 27, 36, 0.1)', 'rgba(24, 27, 36, 0.3)', 'rgba(24, 27, 36, 0.5)', 'rgba(24, 27, 36, 0.75)', 'rgba(24, 27, 36, 0.95)'] : ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.3)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0.75)', 'rgba(255, 255, 255, 0.95)']}
           locations={[0, 0.2, 0.35, 0.5, 0.7, 1]}
           style={styles.gradient}
         >
@@ -128,7 +127,7 @@ export function FeaturedBanner({ posters, onPosterPress }: FeaturedBannerProps) 
                 transform: [{ translateY: titleTranslateY }],
               }}
             >
-              <Animated.Text style={styles.title} numberOfLines={2}>
+              <Animated.Text style={isDark ? styles.titleDark : styles.title} numberOfLines={2}>
                 {poster.name}
               </Animated.Text>
             </Animated.View>
@@ -140,23 +139,9 @@ export function FeaturedBanner({ posters, onPosterPress }: FeaturedBannerProps) 
                 transform: [{ translateY: metaTranslateY }],
               }}
             >
-              {/* Info row */}
-              <View style={styles.infoRow}>
-                {poster.quality && (
-                  <ThemedText style={styles.infoText}>{poster.quality}</ThemedText>
-                )}
-                {poster.quality && genres.length > 0 && (
-                  <ThemedText style={styles.infoDot}>•</ThemedText>
-                )}
-                {genres.length > 0 && (
-                  <ThemedText style={styles.infoText}>
-                    {genres.slice(0, 2).join(', ')}
-                  </ThemedText>
-                )}
-              </View>
 
               {/* Description */}
-              <ThemedText style={styles.description} numberOfLines={2}>
+              <ThemedText style={isDark ? styles.descriptionDark : styles.description} numberOfLines={2}>
                 {poster.descriptions}
               </ThemedText>
             </Animated.View>
@@ -173,14 +158,24 @@ export function FeaturedBanner({ posters, onPosterPress }: FeaturedBannerProps) 
             >
               <Pressable 
                 style={styles.playButton}
-                onPress={() => onPosterPress?.(poster)}
+                onPress={() => {
+                  router.push({
+                    pathname: '/xem-phim/[id]',
+                    params: { id: slug },
+                  });
+                }}
               >
                 <Ionicons name="play" size={20} color="#fff" />
               </Pressable>
 
               <Pressable 
                 style={styles.infoButton}
-                onPress={() => onPosterPress?.(poster)}
+                onPress={() => {
+                  router.push({
+                    pathname:'/phim/[id]',
+                    params: { id: slug },
+                  })
+                }}
               >
                 <Ionicons name="information-circle-outline" size={24} color="#1a1a1a" />
               </Pressable>
@@ -240,6 +235,16 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 12,
+    color: '#4a4a4a',
+    lineHeight: 34,
+    textShadowColor: 'rgb(0, 0, 0, 1)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 5,
+  },
+  titleDark: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 12,
     color: '#fff',
     lineHeight: 34,
     textShadowColor: 'rgb(0, 0, 0, 1)',
@@ -267,6 +272,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     color: '#4a4a4a',
+    marginBottom: 20,
+  },
+  descriptionDark: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: 'rgba(255, 255, 255, 0.53)',
     marginBottom: 20,
   },
   buttonsContainer: {
